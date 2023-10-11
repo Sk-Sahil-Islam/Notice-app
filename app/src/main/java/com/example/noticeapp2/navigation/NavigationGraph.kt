@@ -21,7 +21,7 @@ fun NavigationGraph(
             SignInScreen(navController = navController)
         }
         composable(route = Screens.HomeScreen.route) {
-            HomeScreen()
+            HomeScreen(navController = navController)
         }
     }
 }

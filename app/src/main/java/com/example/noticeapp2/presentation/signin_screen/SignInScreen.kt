@@ -1,15 +1,13 @@
 package com.example.noticeapp2.presentation.signin_screen
 
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -24,7 +22,6 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -50,22 +47,24 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.noticeapp2.R
+import com.example.noticeapp2.data.AuthViewModel
 import com.example.noticeapp2.navigation.Screens
 import com.example.noticeapp2.ui.theme.Kanit
 import com.example.noticeapp2.ui.theme.LinkColor
+import com.example.noticeapp2.util.Resource
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignInScreen(
-    viewModel: SignInViewModel = hiltViewModel(),
+    viewModel: AuthViewModel = hiltViewModel(),
     navController: NavController
 ) {
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
-    val state by viewModel.signInState.collectAsState(SignInState())
+    val state = viewModel.signInState.collectAsState()
     val context = LocalContext.current
     val buttonEnabled = remember { mutableStateOf(true) }
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
@@ -76,7 +75,8 @@ fun SignInScreen(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Sign In", fontFamily = Kanit, fontWeight = FontWeight.Normal, fontSize = 26.sp)
+        Text(text = "Sign In", fontFamily = Kanit, fontWeight = FontWeight.ExtraLight, fontSize = 22.sp)
+        Text(text = "Welcome back!", fontFamily = Kanit, fontWeight = FontWeight.Normal, fontSize = 28.sp)
         Spacer(modifier = Modifier.size(20.dp))
         OutlinedTextField(
             value = email,
@@ -84,18 +84,21 @@ fun SignInScreen(
                 email = it
             },
             label = { Text(text = "Email") },
-            leadingIcon = { Icon(imageVector = Icons.Outlined.Email, contentDescription = email) },
+            leadingIcon = { Icon(imageVector = Icons.Outlined.Email, contentDescription = "email") },
             maxLines = 1,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            shape = RoundedCornerShape(12.dp)
         )
-        Spacer(modifier = Modifier.size(16.dp))
+
+        Spacer(modifier = Modifier.size(14.dp))
+
         OutlinedTextField(
             value = password,
             onValueChange = {
                 password = it
             },
             label = { Text(text = "Password") },
-            leadingIcon = { Icon(imageVector = Icons.Outlined.Lock, contentDescription = email) },
+            leadingIcon = { Icon(imageVector = Icons.Outlined.Lock, contentDescription = "password") },
             maxLines = 1,
             trailingIcon = {
                 val image = if(passwordVisible) R.drawable.outline_visibility_24
@@ -108,9 +111,11 @@ fun SignInScreen(
                 }
             },
             visualTransformation = if(passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            shape = RoundedCornerShape(12.dp)
         )
-        Spacer(modifier = Modifier.size(20.dp))
+
+        Spacer(modifier = Modifier.size(40.dp))
 
         Button(
             onClick = {
@@ -121,7 +126,7 @@ fun SignInScreen(
             enabled = buttonEnabled.value,
             modifier = Modifier.width(200.dp)
         ) {
-            if (state.isLoading){
+            if (state.value is Resource.Loading){
                 CircularProgressIndicator(
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp)
@@ -132,28 +137,28 @@ fun SignInScreen(
                 Text(text = "Sign In")
             }
         }
-        Spacer(modifier = Modifier.size(15.dp))
-        Row (
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            Spacer(modifier = Modifier
-                .size(1.dp)
-                .background(LocalContentColor.current)
-                .weight(1f))
-            Text(text = "or", modifier = Modifier.padding(10.dp))
-            Spacer(modifier = Modifier
-                .size(1.dp)
-                .weight(1f)
-                .background(LocalContentColor.current))
-        }
-        Spacer(modifier = Modifier.size(10.dp))
+        Spacer(modifier = Modifier.size(5.dp))
+//        Row (
+//            modifier = Modifier.fillMaxWidth(),
+//            verticalAlignment = Alignment.CenterVertically
+//        ){
+//            Spacer(modifier = Modifier
+//                .size(1.dp)
+//                .background(LocalContentColor.current)
+//                .weight(1f))
+//            Text(text = "or", modifier = Modifier.padding(10.dp))
+//            Spacer(modifier = Modifier
+//                .size(1.dp)
+//                .weight(1f)
+//                .background(LocalContentColor.current))
+//        }
+//        Spacer(modifier = Modifier.size(10.dp))
 
         val annotatedString = buildAnnotatedString {
-            withStyle(SpanStyle(color = LocalContentColor.current, fontSize = 16.sp)) {
+            withStyle(SpanStyle(color = LocalContentColor.current, fontSize = 16.sp, fontFamily = Kanit, fontWeight = FontWeight.W300)) {
                 append("Don't have an account?  ")
             }
-            withStyle(SpanStyle(color = LinkColor,  fontSize = 16.sp, fontWeight = FontWeight.W500)) {
+            withStyle(SpanStyle(color = LinkColor,  fontSize = 16.sp, fontWeight = FontWeight.W400, fontFamily = Kanit)) {
                 append("Sign Up")
             }
         }
@@ -165,22 +170,50 @@ fun SignInScreen(
             }
         })
 
-        LaunchedEffect(key1 = state.isSuccess) {
-            scope.launch {
-                if (state.isSuccess?.isNotEmpty() == true) {
-                    val success = state.isSuccess
-                    Toast.makeText(context, success, Toast.LENGTH_SHORT).show()
-                    navController.navigate(Screens.HomeScreen.route)
+        state.value?.let {
+            when(it) {
+                is Resource.Error -> {
+                    LaunchedEffect(state.value is Resource.Error) {
+                        Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+                        buttonEnabled.value = true
+                    }
+                }
+                is Resource.Loading -> {}
+                is Resource.Success -> {
+                    LaunchedEffect(Unit) {
+                        Toast.makeText(context, "Sign in successful ${it.data?.email}", Toast.LENGTH_LONG).show()
+                        navController.navigate(Screens.HomeScreen.route){
+                            popUpTo(navController.graph.id){
+                                inclusive = true
+                            }
+                        }
+                    }
                 }
             }
         }
-        LaunchedEffect(key1 = state.isError) {
-            scope.launch {
-                if (state.isSuccess?.isNotEmpty() == true) {
-                    val error = state.isError
-                    Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
+
+//        LaunchedEffect(key1 = state.isSuccess) {
+//            scope.launch {
+//                if (state.isSuccess?.isNotEmpty() == true) {
+//                    val success = state.isSuccess
+//                    Toast.makeText(context, success, Toast.LENGTH_SHORT).show()
+//                    navController.navigate(Screens.HomeScreen.route){
+//                        popUpTo(navController.graph.id){
+//                            inclusive = true
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        LaunchedEffect(key1 = state.isError) {
+//            scope.launch {
+//                if (state.isError?.isNotEmpty() == true) {
+//                    val error = state.isError
+//                    Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+//                }
+//                buttonEnabled.value = true
+//            }
+//        }
     }
 }
+
