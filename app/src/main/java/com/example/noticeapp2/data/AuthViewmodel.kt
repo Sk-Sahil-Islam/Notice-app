@@ -27,16 +27,19 @@ class AuthViewModel @Inject constructor(
 
     val currentUser = repository.currentUser
 
-    init {
-        if(repository.currentUser != null) {
-            _signInState.value = Resource.Success(repository.currentUser!!)
-        }
-    }
+//    init {
+//        if(repository.currentUser != null) {
+//            _signInState.value = Resource.Success(repository.currentUser!!)
+//        }
+//    }
 
     fun loginUser(email: String, password: String) = viewModelScope.launch {
         _signInState.value = Resource.Loading()
         val result = repository.loginUser(email, password)
         _signInState.value = result
+        if (repository.currentUser?.isEmailVerified == false) {
+            _signInState.value = Resource.Error("Verify your email to sign in")
+        }
     }
 
     fun registerUser(email: String, password: String) = viewModelScope.launch {

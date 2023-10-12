@@ -79,13 +79,14 @@ fun SignUpScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(horizontal = 24.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ){
         Text(text = "Welcome,", fontFamily = Kanit, fontWeight = FontWeight.ExtraLight, fontSize = 22.sp)
         Text(text = "Create An Account", fontFamily = Kanit, fontWeight = FontWeight.Normal, fontSize = 28.sp)
         Spacer(modifier = Modifier.size(30.dp))
         OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
             value = email,
             onValueChange = {
                 email = it
@@ -100,6 +101,7 @@ fun SignUpScreen(
         Spacer(modifier = Modifier.size(14.dp))
 
         OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
             value = password,
             onValueChange = {
                 password = it
@@ -125,6 +127,7 @@ fun SignUpScreen(
         Spacer(modifier = Modifier.size(14.dp))
 
         OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
             value = confirmPassword,
             onValueChange = {
                 confirmPassword = it
@@ -177,7 +180,11 @@ fun SignUpScreen(
             val start = annotatedString.text.indexOf("Sign In")
             val end = start + "SignIn".length
             if (it in start..end) {
-                navController.navigate(Screens.SignInScreen.route)
+                navController.navigate(Screens.SignInScreen.route){
+                    popUpTo(Screens.SignInScreen.route){
+                        inclusive = true
+                    }
+                }
             }
         })
 
@@ -205,15 +212,17 @@ fun SignUpScreen(
         state.value?.let {
             when(it) {
                 is Resource.Error -> {
-                    Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
-                    buttonEnabled.value = true
+                    LaunchedEffect(state.value is Resource.Error) {
+                        Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+                        buttonEnabled.value = true
+                    }
                 }
                 is Resource.Loading -> {}
                 is Resource.Success -> {
                     LaunchedEffect(Unit) {
-                        Toast.makeText(context, "Sign in successful", Toast.LENGTH_LONG).show()
-                        navController.navigate(Screens.HomeScreen.route){
-                            popUpTo(navController.graph.id){
+                        Toast.makeText(context, "Account created and email sent successfully", Toast.LENGTH_LONG).show()
+                        navController.navigate(Screens.SignInScreen.route){
+                            popUpTo(Screens.SignUpScreen.route){
                                 inclusive = true
                             }
                         }

@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -79,6 +80,7 @@ fun SignInScreen(
         Text(text = "Welcome back!", fontFamily = Kanit, fontWeight = FontWeight.Normal, fontSize = 28.sp)
         Spacer(modifier = Modifier.size(20.dp))
         OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
             value = email,
             onValueChange = {
                 email = it
@@ -93,6 +95,7 @@ fun SignInScreen(
         Spacer(modifier = Modifier.size(14.dp))
 
         OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
             value = password,
             onValueChange = {
                 password = it
@@ -166,7 +169,9 @@ fun SignInScreen(
             val start = annotatedString.text.indexOf("Sign Up")
             val end = start + "Sign Up".length
             if (it in start..end) {
-                navController.popBackStack()
+                navController.navigate(Screens.SignUpScreen.route){
+                    popUpTo(0)
+                }
             }
         })
 
@@ -174,19 +179,22 @@ fun SignInScreen(
             when(it) {
                 is Resource.Error -> {
                     LaunchedEffect(state.value is Resource.Error) {
-                        Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
                         buttonEnabled.value = true
                     }
                 }
                 is Resource.Loading -> {}
                 is Resource.Success -> {
-                    LaunchedEffect(Unit) {
-                        Toast.makeText(context, "Sign in successful ${it.data?.email}", Toast.LENGTH_LONG).show()
-                        navController.navigate(Screens.HomeScreen.route){
-                            popUpTo(navController.graph.id){
-                                inclusive = true
+                    LaunchedEffect(state.value is Resource.Success) {
+                        if (viewModel.currentUser?.isEmailVerified == true){
+                            Toast.makeText(context, "Sign in successful", Toast.LENGTH_LONG).show()
+                            navController.navigate(Screens.HomeScreen.route){
+                                popUpTo(Screens.SignInScreen.route){
+                                    inclusive = true
+                                }
                             }
                         }
+
                     }
                 }
             }

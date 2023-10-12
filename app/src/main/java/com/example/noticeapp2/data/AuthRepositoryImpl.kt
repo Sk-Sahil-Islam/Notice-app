@@ -23,7 +23,6 @@ class AuthRepositoryImpl @Inject constructor(
             val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
             Resource.Success(result.user!!)
         } catch (e: Exception) {
-
             e.printStackTrace()
             Resource.Error(e.message.toString())
         }
@@ -32,10 +31,11 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun registerUser(email: String, password: String): Resource<FirebaseUser> {
         return try {
             val result = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
+            firebaseAuth.currentUser?.sendEmailVerification()?.await()
             Resource.Success(result.user!!)
         } catch (e: Exception) {
             e.printStackTrace()
-            Resource.Error(e.toString())
+            Resource.Error(e.message.toString())
         }
     }
 
