@@ -10,4 +10,13 @@ val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
-val LinkColor = Color(0xFF00D8FF)
+val LinkColorLight = Color(0xFF00D8FF)
+val LinkColorDark = Color(0xFF0098E9)
+
+val BackgroundLight = Color(0x37E0C5FA)
+
+val PrimaryColorDark = Color(0xFFA2ABEB)
+val WhitePink = Color(0x43FFFFFF)
+
+val PrimaryColorLight = Color(0xFF8D8BC5)
+

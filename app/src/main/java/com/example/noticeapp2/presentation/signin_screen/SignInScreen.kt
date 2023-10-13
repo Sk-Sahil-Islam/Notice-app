@@ -1,7 +1,10 @@
 package com.example.noticeapp2.presentation.signin_screen
 
 import android.widget.Toast
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -51,7 +54,8 @@ import com.example.noticeapp2.R
 import com.example.noticeapp2.data.AuthViewModel
 import com.example.noticeapp2.navigation.Screens
 import com.example.noticeapp2.ui.theme.Kanit
-import com.example.noticeapp2.ui.theme.LinkColor
+import com.example.noticeapp2.ui.theme.LinkColorDark
+import com.example.noticeapp2.ui.theme.LinkColorLight
 import com.example.noticeapp2.util.Resource
 import kotlinx.coroutines.launch
 
@@ -73,12 +77,15 @@ fun SignInScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(horizontal = 24.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = "Sign In", fontFamily = Kanit, fontWeight = FontWeight.ExtraLight, fontSize = 22.sp)
-        Text(text = "Welcome back!", fontFamily = Kanit, fontWeight = FontWeight.Normal, fontSize = 28.sp)
-        Spacer(modifier = Modifier.size(20.dp))
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+            Text(text = "Welcome", fontFamily = Kanit, fontWeight = FontWeight.Normal, fontSize = 28.sp, color = MaterialTheme.colorScheme.primary)
+            Text(text = " back!", fontFamily = Kanit, fontWeight = FontWeight.Normal, fontSize = 28.sp)
+        }
+        Spacer(modifier = Modifier.size(30.dp))
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             value = email,
@@ -137,31 +144,18 @@ fun SignInScreen(
                 buttonEnabled.value = false
             }
             else {
-                Text(text = "Sign In")
+                Text(text = "Sign In", fontSize = 15.sp)
             }
         }
         Spacer(modifier = Modifier.size(5.dp))
-//        Row (
-//            modifier = Modifier.fillMaxWidth(),
-//            verticalAlignment = Alignment.CenterVertically
-//        ){
-//            Spacer(modifier = Modifier
-//                .size(1.dp)
-//                .background(LocalContentColor.current)
-//                .weight(1f))
-//            Text(text = "or", modifier = Modifier.padding(10.dp))
-//            Spacer(modifier = Modifier
-//                .size(1.dp)
-//                .weight(1f)
-//                .background(LocalContentColor.current))
-//        }
-//        Spacer(modifier = Modifier.size(10.dp))
+
+        val signColor = if (isSystemInDarkTheme()) LinkColorLight else LinkColorDark
 
         val annotatedString = buildAnnotatedString {
             withStyle(SpanStyle(color = LocalContentColor.current, fontSize = 16.sp, fontFamily = Kanit, fontWeight = FontWeight.W300)) {
                 append("Don't have an account?  ")
             }
-            withStyle(SpanStyle(color = LinkColor,  fontSize = 16.sp, fontWeight = FontWeight.W400, fontFamily = Kanit)) {
+            withStyle(SpanStyle(color = signColor,  fontSize = 16.sp, fontWeight = FontWeight.W400, fontFamily = Kanit)) {
                 append("Sign Up")
             }
         }
@@ -170,7 +164,9 @@ fun SignInScreen(
             val end = start + "Sign Up".length
             if (it in start..end) {
                 navController.navigate(Screens.SignUpScreen.route){
-                    popUpTo(0)
+                    popUpTo(Screens.SignUpScreen.route){
+                        inclusive = true
+                    }
                 }
             }
         })
@@ -182,46 +178,22 @@ fun SignInScreen(
                         Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
                         buttonEnabled.value = true
                     }
+                    buttonEnabled.value = true
                 }
                 is Resource.Loading -> {}
                 is Resource.Success -> {
                     LaunchedEffect(state.value is Resource.Success) {
+                        buttonEnabled.value = true
                         if (viewModel.currentUser?.isEmailVerified == true){
                             Toast.makeText(context, "Sign in successful", Toast.LENGTH_LONG).show()
                             navController.navigate(Screens.HomeScreen.route){
-                                popUpTo(Screens.SignInScreen.route){
-                                    inclusive = true
-                                }
+                                popUpTo(0)
                             }
                         }
-
                     }
                 }
             }
         }
-
-//        LaunchedEffect(key1 = state.isSuccess) {
-//            scope.launch {
-//                if (state.isSuccess?.isNotEmpty() == true) {
-//                    val success = state.isSuccess
-//                    Toast.makeText(context, success, Toast.LENGTH_SHORT).show()
-//                    navController.navigate(Screens.HomeScreen.route){
-//                        popUpTo(navController.graph.id){
-//                            inclusive = true
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        LaunchedEffect(key1 = state.isError) {
-//            scope.launch {
-//                if (state.isError?.isNotEmpty() == true) {
-//                    val error = state.isError
-//                    Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-//                }
-//                buttonEnabled.value = true
-//            }
-//        }
     }
 }
 

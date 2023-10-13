@@ -1,8 +1,8 @@
 package com.example.noticeapp2.presentation.signup_screen
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -47,6 +47,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,8 +56,10 @@ import androidx.navigation.NavController
 import com.example.noticeapp2.R
 import com.example.noticeapp2.data.AuthViewModel
 import com.example.noticeapp2.navigation.Screens
+import com.example.noticeapp2.presentation.connect_screen.OrSection
 import com.example.noticeapp2.ui.theme.Kanit
-import com.example.noticeapp2.ui.theme.LinkColor
+import com.example.noticeapp2.ui.theme.LinkColorDark
+import com.example.noticeapp2.ui.theme.LinkColorLight
 import com.example.noticeapp2.util.Resource
 import kotlinx.coroutines.launch
 
@@ -83,7 +86,11 @@ fun SignUpScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ){
         Text(text = "Welcome,", fontFamily = Kanit, fontWeight = FontWeight.ExtraLight, fontSize = 22.sp)
-        Text(text = "Create An Account", fontFamily = Kanit, fontWeight = FontWeight.Normal, fontSize = 28.sp)
+
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+            Text(text = "Create", fontFamily = Kanit, fontWeight = FontWeight.Normal, fontSize = 28.sp, color = MaterialTheme.colorScheme.primary)
+            Text(text = " An Account", fontFamily = Kanit, fontWeight = FontWeight.Normal, fontSize = 28.sp)
+        }
         Spacer(modifier = Modifier.size(30.dp))
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
@@ -162,17 +169,19 @@ fun SignUpScreen(
                 buttonEnabled.value = false
             }
             else {
-                Text(text = "Sign Up")
+                Text(text = "Sign Up", fontSize = 15.sp)
             }
         }
 
         Spacer(modifier = Modifier.size(5.dp))
 
+        val signColor = if (isSystemInDarkTheme()) LinkColorLight else LinkColorDark
+
         val annotatedString = buildAnnotatedString {
             withStyle(SpanStyle(color = LocalContentColor.current, fontSize = 15.sp, fontWeight = FontWeight.W300, fontFamily = Kanit)) {
                 append("Already have an account?  ")
             }
-            withStyle(SpanStyle(color = LinkColor,  fontSize = 16.sp, fontWeight = FontWeight.W500, fontFamily = Kanit)) {
+            withStyle(SpanStyle(color = signColor,  fontSize = 16.sp, fontWeight = FontWeight.W500, fontFamily = Kanit)) {
                 append("Sign In")
             }
         }
@@ -190,22 +199,17 @@ fun SignUpScreen(
 
         Spacer(modifier = Modifier.size(24.dp))
 
-        Row (
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            Spacer(modifier = Modifier
-                .size(1.dp)
-                .background(LocalContentColor.current)
-                .weight(1f))
-            Text(text = "or", modifier = Modifier.padding(10.dp))
-            Spacer(modifier = Modifier
-                .size(1.dp)
-                .weight(1f)
-                .background(LocalContentColor.current))
-        }
+        OrSection(color = LocalContentColor.current.copy(alpha = 0.4f))
 
-        Spacer(modifier = Modifier.size(26.dp))
+        Text(
+            text = "Connect using different methods",
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            fontFamily = Kanit,
+            fontSize = 12.sp,
+            color = LocalContentColor.current.copy(alpha = 0.4f)
+        )
+
+        Spacer(modifier = Modifier.size(24.dp))
 
         ConnectWith()
 
@@ -220,7 +224,7 @@ fun SignUpScreen(
                 is Resource.Loading -> {}
                 is Resource.Success -> {
                     LaunchedEffect(Unit) {
-                        Toast.makeText(context, "Account created and email sent successfully", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, "Check mail to complete sign up", Toast.LENGTH_LONG).show()
                         navController.navigate(Screens.SignInScreen.route){
                             popUpTo(Screens.SignUpScreen.route){
                                 inclusive = true
@@ -230,29 +234,6 @@ fun SignUpScreen(
                 }
             }
         }
-
-//        LaunchedEffect(key1 = state.isSuccess) {
-//            scope.launch {
-//                if (state.isSuccess?.isNotEmpty() == true) {
-//                    val success = state.isSuccess
-//                    Toast.makeText(context, success, Toast.LENGTH_SHORT).show()
-//                    navController.navigate(Screens.HomeScreen.route){
-//                        popUpTo(navController.graph.id) {
-//                            inclusive = true
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        LaunchedEffect(key1 = state.isError) {
-//            scope.launch {
-//                if (state.isError?.isNotEmpty() == true) {
-//                    val error = state.isError
-//                    Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-//                    buttonEnabled.value = true
-//                }
-//            }
-//        }
     }
 }
 
@@ -263,13 +244,15 @@ fun ConnectWith(
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         IconButton(onClick = { /*TODO*/ }) {
             Icon(painter = painterResource(id = R.drawable.ic_google), contentDescription = "google", Modifier.size(30.dp), tint = Color.Unspecified)
         }
+        Spacer(modifier = Modifier.size(8.dp))
+        IconButton(onClick = { /*TODO*/ }) {
+            Icon(painter = painterResource(id = R.drawable.ic_facebook), contentDescription = "facebook", Modifier.size(30.dp), tint = Color.Unspecified)
+        }
     }
-    Spacer(modifier = Modifier.size(10.dp))
-    Text(text = "connect with different methods", fontFamily = Kanit, fontWeight = FontWeight.ExtraLight, fontSize = 12.sp)
-
+    Spacer(modifier = Modifier.size(30.dp))
 }
