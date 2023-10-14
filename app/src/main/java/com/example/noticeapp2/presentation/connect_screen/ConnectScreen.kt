@@ -59,19 +59,19 @@ fun ConnectScreen(
 
         ImageCard(Modifier.align(CenterHorizontally))
 
-        Spacer(modifier = Modifier.size(20.dp))
+        Spacer(modifier = Modifier.size(30.dp))
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = "Let others ",
                 fontFamily = Kanit,
                 fontWeight = FontWeight.Normal,
-                fontSize = 28.sp
+                fontSize = 30.sp
             )
             Text(
                 text = "know.",
                 fontFamily = Kanit,
                 fontWeight = FontWeight.Normal,
-                fontSize = 28.sp,
+                fontSize = 30.sp,
                 color = PrimaryColorLight
             )
         }
@@ -79,9 +79,9 @@ fun ConnectScreen(
             text = "An app for managing notifications tailored to a user-friendly experience.",
             fontFamily = Kanit,
             fontWeight = FontWeight.ExtraLight,
-            fontSize = 17.sp
+            fontSize = 18.sp
         )
-        Spacer(modifier = Modifier.size(26.dp))
+        Spacer(modifier = Modifier.size(38.dp))
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
             OutlinedButton(
@@ -113,7 +113,7 @@ fun ConnectScreen(
             }
         }
 
-        Spacer(modifier = Modifier.size(14.dp))
+        Spacer(modifier = Modifier.weight(1f))
 
         OrSection(color = LocalContentColor.current.copy(alpha = 0.4f))
 
@@ -125,16 +125,16 @@ fun ConnectScreen(
             color = LocalContentColor.current.copy(alpha = 0.4f)
         )
 
-        Spacer(modifier = Modifier.size(16.dp))
+        Spacer(modifier = Modifier.size(24.dp))
 
-        Column(modifier = Modifier
+        Row(modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 10.dp), horizontalAlignment = CenterHorizontally) {
-            GoogleConnectOption()
-            Spacer(modifier = Modifier.size(10.dp))
-            FacebookConnectOption()
+            .padding(horizontal = 5.dp), horizontalArrangement = Arrangement.Center) {
+            GoogleConnectOption(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.size(16.dp))
+            FacebookConnectOption(modifier = Modifier.weight(1f))
         }
-
+        Spacer(modifier = Modifier.size(16.dp))
     }
 }
 
@@ -190,15 +190,15 @@ fun OrSection(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GoogleConnectOption() {
+fun GoogleConnectOption(modifier: Modifier = Modifier) {
     Card(
         onClick = {
 
         },
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier,
         border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
-        shape = CircleShape,
-        colors = CardDefaults.cardColors(if (!isSystemInDarkTheme()) WhitePink else Color.Transparent)
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(Color.Transparent)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -222,15 +222,17 @@ fun GoogleConnectOption() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FacebookConnectOption() {
+fun FacebookConnectOption(
+    modifier: Modifier = Modifier
+) {
     Card(
         onClick = {
 
         },
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier,
         border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
-        shape = CircleShape,
-        colors = CardDefaults.cardColors(if (!isSystemInDarkTheme()) WhitePink else Color.Transparent),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(Color.Transparent),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
