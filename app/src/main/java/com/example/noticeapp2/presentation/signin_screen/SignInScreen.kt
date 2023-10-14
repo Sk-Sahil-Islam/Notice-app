@@ -52,6 +52,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.noticeapp2.R
 import com.example.noticeapp2.data.AuthViewModel
+import com.example.noticeapp2.data.SignInViewModel
+import com.example.noticeapp2.data.SignUpUiEvent
 import com.example.noticeapp2.navigation.Screens
 import com.example.noticeapp2.ui.theme.Kanit
 import com.example.noticeapp2.ui.theme.LinkColorDark
@@ -62,14 +64,15 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignInScreen(
-    viewModel: AuthViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel(),
+    signInViewModel: SignInViewModel = hiltViewModel(),
     navController: NavController
 ) {
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
-    val state = viewModel.signInState.collectAsState()
+    val state = authViewModel.signInState.collectAsState()
     val context = LocalContext.current
     val buttonEnabled = remember { mutableStateOf(true) }
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
@@ -91,25 +94,35 @@ fun SignInScreen(
             value = email,
             onValueChange = {
                 email = it
+                signInViewModel.onEvent(SignUpUiEvent.EmailChanged(it))
             },
             label = { Text(text = "Email") },
             leadingIcon = { Icon(imageVector = Icons.Outlined.Email, contentDescription = "email") },
             maxLines = 1,
+            supportingText = {
+                if (!signInViewModel.signInUiState.value.emailError)
+                    Text(text = "Invalid email address.", color = MaterialTheme.colorScheme.error)
+            },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             shape = RoundedCornerShape(12.dp)
         )
 
-        Spacer(modifier = Modifier.size(14.dp))
+        Spacer(modifier = Modifier.size(12.dp))
 
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             value = password,
             onValueChange = {
                 password = it
+                signInViewModel.onEvent(SignUpUiEvent.PasswordChange(it))
             },
             label = { Text(text = "Password") },
             leadingIcon = { Icon(imageVector = Icons.Outlined.Lock, contentDescription = "password") },
             maxLines = 1,
+            supportingText = {
+                if (!signInViewModel.signInUiState.value.passwordError)
+                    Text(text = "Minimum 6 characters.", color = MaterialTheme.colorScheme.error)
+            },
             trailingIcon = {
                 val image = if(passwordVisible) R.drawable.outline_visibility_24
                 else R.drawable.outline_visibility_off_24
@@ -130,10 +143,10 @@ fun SignInScreen(
         Button(
             onClick = {
                 scope.launch {
-                    viewModel.loginUser(email, password)
+                    authViewModel.loginUser(email, password)
                 }
             },
-            enabled = buttonEnabled.value,
+            enabled = buttonEnabled.value && signInViewModel.validateAll(),
             modifier = Modifier.width(200.dp)
         ) {
             if (state.value is Resource.Loading){
@@ -184,7 +197,7 @@ fun SignInScreen(
                 is Resource.Success -> {
                     LaunchedEffect(state.value is Resource.Success) {
                         buttonEnabled.value = true
-                        if (viewModel.currentUser?.isEmailVerified == true){
+                        if (authViewModel.currentUser?.isEmailVerified == true){
                             Toast.makeText(context, "Sign in successful", Toast.LENGTH_LONG).show()
                             navController.navigate(Screens.HomeScreen.route){
                                 popUpTo(0)
