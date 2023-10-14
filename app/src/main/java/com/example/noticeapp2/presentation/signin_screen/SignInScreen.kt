@@ -96,6 +96,7 @@ fun SignInScreen(
                 email = it
                 signInViewModel.onEvent(SignUpUiEvent.EmailChanged(it))
             },
+            isError = !signInViewModel.signInUiState.value.emailError,
             label = { Text(text = "Email") },
             leadingIcon = { Icon(imageVector = Icons.Outlined.Email, contentDescription = "email") },
             maxLines = 1,
@@ -116,6 +117,7 @@ fun SignInScreen(
                 password = it
                 signInViewModel.onEvent(SignUpUiEvent.PasswordChange(it))
             },
+            isError = !signInViewModel.signInUiState.value.passwordError,
             label = { Text(text = "Password") },
             leadingIcon = { Icon(imageVector = Icons.Outlined.Lock, contentDescription = "password") },
             maxLines = 1,
@@ -146,7 +148,7 @@ fun SignInScreen(
                     authViewModel.loginUser(email, password)
                 }
             },
-            enabled = buttonEnabled.value && signInViewModel.validateAll(),
+            enabled = buttonEnabled.value && signInViewModel.validateAll() && password.isNotEmpty(),
             modifier = Modifier.width(200.dp)
         ) {
             if (state.value is Resource.Loading){

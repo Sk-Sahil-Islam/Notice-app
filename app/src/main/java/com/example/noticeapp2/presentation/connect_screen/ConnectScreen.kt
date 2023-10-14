@@ -144,7 +144,7 @@ fun ImageCard(
 ) {
     Card(
         shape = RoundedCornerShape(28.dp),
-        modifier = modifier.shadow(10.dp, shape = RoundedCornerShape(28.dp))
+        modifier = modifier.shadow(11.dp, shape = RoundedCornerShape(28.dp))
     ) {
         Image(
             painter = painterResource(id = R.drawable.connect_image),
