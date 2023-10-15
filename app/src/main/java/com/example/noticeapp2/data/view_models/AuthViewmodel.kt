@@ -1,9 +1,14 @@
-package com.example.noticeapp2.data
+package com.example.noticeapp2.data.view_models
 
+import android.content.Intent
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.result.ActivityResult
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.noticeapp2.data.repositories.auth.AuthRepository
 import com.example.noticeapp2.util.Resource
-import com.google.firebase.auth.FirebaseAuth
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,8 +18,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val repository: AuthRepository
+    private val repository: AuthRepository,
+    private val googleSignInClient: GoogleSignInClient
 ): ViewModel() {
+
+    private val _googleState = MutableStateFlow<Resource<FirebaseUser>?> (null)
+    val googleState: StateFlow<Resource<FirebaseUser>?> = _googleState
 
     private val _signInState = MutableStateFlow<Resource<FirebaseUser>?>(null)
     val signInState: StateFlow<Resource<FirebaseUser>?> = _signInState
@@ -44,6 +53,18 @@ class AuthViewModel @Inject constructor(
         _signUpState.value = Resource.Loading()
         val result = repository.registerUser(email, password)
         _signUpState.value = result
+    }
+
+    fun googleSignIn(credential: AuthCredential) = viewModelScope.launch {
+        _googleState.value = Resource.Loading()
+        val result = repository.googleSignIn(credential)
+        _googleState.value = result
+    }
+
+    fun googleLaunch(
+        launcher: ManagedActivityResultLauncher<Intent, ActivityResult>
+    ) {
+        launcher.launch(googleSignInClient.signInIntent)
     }
 
     fun logOut() {

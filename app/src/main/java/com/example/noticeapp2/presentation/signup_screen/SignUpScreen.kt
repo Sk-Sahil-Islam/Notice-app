@@ -37,7 +37,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -52,11 +51,10 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.noticeapp2.R
-import com.example.noticeapp2.data.AuthViewModel
-import com.example.noticeapp2.data.SignUpViewModel
+import com.example.noticeapp2.data.view_models.AuthViewModel
+import com.example.noticeapp2.data.view_models.SignUpViewModel
 import com.example.noticeapp2.data.SignUpUiEvent
 import com.example.noticeapp2.navigation.Screens
-import com.example.noticeapp2.presentation.connect_screen.OrSection
 import com.example.noticeapp2.ui.theme.Kanit
 import com.example.noticeapp2.ui.theme.LinkColorDark
 import com.example.noticeapp2.ui.theme.LinkColorLight
@@ -262,22 +260,6 @@ fun SignUpScreen(
             }
         })
 
-        Spacer(modifier = Modifier.size(24.dp))
-
-        OrSection(color = LocalContentColor.current.copy(alpha = 0.4f))
-
-        Text(
-            text = "Connect using different methods",
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            fontFamily = Kanit,
-            fontSize = 12.sp,
-            color = LocalContentColor.current.copy(alpha = 0.4f)
-        )
-
-        Spacer(modifier = Modifier.size(24.dp))
-
-        ConnectWith()
-
         state.value?.let {
             when (it) {
                 is Resource.Error -> {
@@ -304,32 +286,3 @@ fun SignUpScreen(
     }
 }
 
-@Composable
-fun ConnectWith(
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        IconButton(onClick = { /*TODO*/ }) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_google),
-                contentDescription = "google",
-                Modifier.size(30.dp),
-                tint = Color.Unspecified
-            )
-        }
-        Spacer(modifier = Modifier.size(8.dp))
-        IconButton(onClick = { /*TODO*/ }) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_facebook),
-                contentDescription = "facebook",
-                Modifier.size(30.dp),
-                tint = Color.Unspecified
-            )
-        }
-    }
-    Spacer(modifier = Modifier.size(30.dp))
-}

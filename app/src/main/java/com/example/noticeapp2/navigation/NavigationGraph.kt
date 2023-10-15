@@ -6,7 +6,6 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.example.noticeapp2.presentation.connect_screen.ConnectScreen
 import com.example.noticeapp2.presentation.home_screen.HomeScreen
 import com.example.noticeapp2.presentation.signin_screen.SignInScreen

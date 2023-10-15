@@ -1,9 +1,11 @@
 package com.example.noticeapp2.presentation.connect_screen
 
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,12 +15,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
@@ -26,29 +28,53 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.noticeapp2.R
+import com.example.noticeapp2.data.view_models.AuthViewModel
 import com.example.noticeapp2.navigation.Screens
 import com.example.noticeapp2.ui.theme.Kanit
 import com.example.noticeapp2.ui.theme.PrimaryColorLight
-import com.example.noticeapp2.ui.theme.WhitePink
+import com.example.noticeapp2.util.Resource
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.GoogleAuthProvider
 
 @Composable
 fun ConnectScreen(
-    navController: NavController
+    navController: NavController,
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
+    val googleSignInState = authViewModel.googleState.collectAsState()
+
+    val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {
+        val account = GoogleSignIn.getSignedInAccountFromIntent(it.data)
+        try {
+            val result = account.getResult(ApiException::class.java)
+            val credentials = GoogleAuthProvider.getCredential(result.idToken, null)
+            authViewModel.googleSignIn(credentials)
+        } catch (it: ApiException) {
+            print(it)
+        }
+    }
+    val context = LocalContext.current
     val scrollState = rememberScrollState()
+
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -60,6 +86,12 @@ fun ConnectScreen(
         ImageCard(Modifier.align(CenterHorizontally))
 
         Spacer(modifier = Modifier.size(30.dp))
+
+        if (googleSignInState.value is Resource.Loading) {
+            CircularProgressIndicator(modifier = Modifier.align(CenterHorizontally), color = MaterialTheme.colorScheme.primary)
+            Spacer(modifier = Modifier.size(8.dp))
+        }
+
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = "Let others ",
@@ -75,6 +107,7 @@ fun ConnectScreen(
                 color = PrimaryColorLight
             )
         }
+
         Text(
             text = "An app for managing notifications tailored to a user-friendly experience.",
             fontFamily = Kanit,
@@ -130,11 +163,34 @@ fun ConnectScreen(
         Row(modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 5.dp), horizontalArrangement = Arrangement.Center) {
-            GoogleConnectOption(modifier = Modifier.weight(1f))
+            GoogleConnectOption(modifier = Modifier.weight(1f)) {
+                authViewModel.googleLaunch(launcher = launcher)
+            }
             Spacer(modifier = Modifier.size(16.dp))
             FacebookConnectOption(modifier = Modifier.weight(1f))
         }
         Spacer(modifier = Modifier.size(16.dp))
+
+    }
+    googleSignInState.value?.let {
+        when (it) {
+            is Resource.Error -> {
+                LaunchedEffect(googleSignInState.value is Resource.Error) {
+                    Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            is Resource.Loading -> {}
+            is Resource.Success -> {
+                LaunchedEffect(Unit) {
+                    Toast.makeText(context, "Sign in successful ${it.data?.email}", Toast.LENGTH_LONG)
+                        .show()
+                    navController.navigate(Screens.HomeScreen.route){
+                        popUpTo(0)
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -190,10 +246,13 @@ fun OrSection(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GoogleConnectOption(modifier: Modifier = Modifier) {
+fun GoogleConnectOption(
+    modifier: Modifier = Modifier,
+    onSignInByGoogleClick: () -> Unit
+) {
     Card(
         onClick = {
-
+            onSignInByGoogleClick.invoke()
         },
         modifier = modifier,
         border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),

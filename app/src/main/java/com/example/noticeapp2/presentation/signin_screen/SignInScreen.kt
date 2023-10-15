@@ -1,6 +1,8 @@
 package com.example.noticeapp2.presentation.signin_screen
 
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,6 +39,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -51,14 +54,18 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.noticeapp2.R
-import com.example.noticeapp2.data.AuthViewModel
-import com.example.noticeapp2.data.SignInViewModel
+import com.example.noticeapp2.data.view_models.AuthViewModel
+import com.example.noticeapp2.data.view_models.SignInViewModel
 import com.example.noticeapp2.data.SignUpUiEvent
 import com.example.noticeapp2.navigation.Screens
+import com.example.noticeapp2.presentation.connect_screen.OrSection
 import com.example.noticeapp2.ui.theme.Kanit
 import com.example.noticeapp2.ui.theme.LinkColorDark
 import com.example.noticeapp2.ui.theme.LinkColorLight
 import com.example.noticeapp2.util.Resource
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,6 +75,19 @@ fun SignInScreen(
     signInViewModel: SignInViewModel = hiltViewModel(),
     navController: NavController
 ) {
+
+    val googleSignInState = authViewModel.googleState.collectAsState()
+
+    val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {
+        val account = GoogleSignIn.getSignedInAccountFromIntent(it.data)
+        try {
+            val result = account.getResult(ApiException::class.java)
+            val credentials = GoogleAuthProvider.getCredential(result.idToken, null)
+            authViewModel.googleSignIn(credentials)
+        } catch (it: ApiException) {
+            print(it)
+        }
+    }
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -151,7 +171,7 @@ fun SignInScreen(
             enabled = buttonEnabled.value && signInViewModel.validateAll() && password.isNotEmpty(),
             modifier = Modifier.width(200.dp)
         ) {
-            if (state.value is Resource.Loading){
+            if (state.value is Resource.Loading || googleSignInState.value is Resource.Loading){
                 CircularProgressIndicator(
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp)
@@ -186,6 +206,27 @@ fun SignInScreen(
             }
         })
 
+        Spacer(modifier = Modifier.size(24.dp))
+
+        OrSection(color = LocalContentColor.current.copy(alpha = 0.4f))
+
+        Text(
+            text = "Connect using different methods",
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            fontFamily = Kanit,
+            fontSize = 12.sp,
+            color = LocalContentColor.current.copy(alpha = 0.4f)
+        )
+
+        Spacer(modifier = Modifier.size(24.dp))
+
+        ConnectWith(
+            onSignInWithGoogle = {
+                authViewModel.googleLaunch(launcher = launcher)
+            }
+        )
+
+
         state.value?.let {
             when(it) {
                 is Resource.Error -> {
@@ -209,6 +250,61 @@ fun SignInScreen(
                 }
             }
         }
+
+        googleSignInState.value?.let {
+            when (it) {
+                is Resource.Error -> {
+                    LaunchedEffect(googleSignInState.value is Resource.Error) {
+                        Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                is Resource.Loading -> {}
+                is Resource.Success -> {
+                    LaunchedEffect(Unit) {
+                        Toast.makeText(context, "Sign in successful ${it.data?.email}", Toast.LENGTH_LONG)
+                            .show()
+                        navController.navigate(Screens.HomeScreen.route){
+                            popUpTo(0)
+                        }
+                    }
+                }
+            }
+        }
     }
+}
+@Composable
+fun ConnectWith(
+    modifier: Modifier = Modifier,
+    onSignInWithGoogle: () -> Unit
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        IconButton(onClick = {
+            onSignInWithGoogle.invoke()
+        }) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_google),
+                contentDescription = "google",
+                Modifier.size(30.dp),
+                tint = Color.Unspecified
+            )
+        }
+
+        Spacer(modifier = Modifier.size(16.dp))
+
+        IconButton(onClick = { /*TODO*/ }) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_facebook),
+                contentDescription = "facebook",
+                Modifier.size(30.dp),
+                tint = Color.Unspecified
+            )
+        }
+    }
+    Spacer(modifier = Modifier.size(30.dp))
 }
 

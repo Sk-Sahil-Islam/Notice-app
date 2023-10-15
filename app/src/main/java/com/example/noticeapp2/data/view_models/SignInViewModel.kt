@@ -1,7 +1,9 @@
-package com.example.noticeapp2.data
+package com.example.noticeapp2.data.view_models
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.example.noticeapp2.data.SignUpUiEvent
+import com.example.noticeapp2.data.SignUpUiState
 import com.example.noticeapp2.data.rules.Validator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
