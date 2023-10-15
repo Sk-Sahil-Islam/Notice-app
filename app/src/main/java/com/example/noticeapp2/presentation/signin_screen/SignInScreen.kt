@@ -120,6 +120,7 @@ fun SignInScreen(
             label = { Text(text = "Email") },
             leadingIcon = { Icon(imageVector = Icons.Outlined.Email, contentDescription = "email") },
             maxLines = 1,
+            singleLine = true,
             supportingText = {
                 if (!signInViewModel.signInUiState.value.emailError)
                     Text(text = "Invalid email address.", color = MaterialTheme.colorScheme.error)
@@ -141,6 +142,7 @@ fun SignInScreen(
             label = { Text(text = "Password") },
             leadingIcon = { Icon(imageVector = Icons.Outlined.Lock, contentDescription = "password") },
             maxLines = 1,
+            singleLine = true,
             supportingText = {
                 if (!signInViewModel.signInUiState.value.passwordError)
                     Text(text = "Minimum 6 characters.", color = MaterialTheme.colorScheme.error)

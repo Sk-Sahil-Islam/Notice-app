@@ -255,7 +255,7 @@ fun GoogleConnectOption(
             onSignInByGoogleClick.invoke()
         },
         modifier = modifier,
-        border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
+        border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary.copy(alpha = 0.65f)),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(Color.Transparent)
     ) {
@@ -289,7 +289,7 @@ fun FacebookConnectOption(
 
         },
         modifier = modifier,
-        border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
+        border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary.copy(alpha = 0.65f)),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(Color.Transparent),
     ) {

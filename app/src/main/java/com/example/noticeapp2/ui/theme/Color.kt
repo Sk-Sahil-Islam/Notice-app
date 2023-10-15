@@ -13,7 +13,7 @@ val Pink40 = Color(0xFF7D5260)
 val LinkColorLight = Color(0xFF00D8FF)
 val LinkColorDark = Color(0xFF0098E9)
 
-val BackgroundLight = Color(0x37E0C5FA)
+val BackgroundLight = Color(0xFFF4F0F8)
 val BackgroundDark = Color(0xFF17131B)
 
 val PrimaryColorDark = Color(0xFFA2ABEB)
