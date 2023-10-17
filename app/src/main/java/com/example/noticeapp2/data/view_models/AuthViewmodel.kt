@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.noticeapp2.data.repositories.auth.AuthRepository
 import com.example.noticeapp2.util.Resource
+import com.facebook.CallbackManager
+import com.facebook.login.LoginManager
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseUser
@@ -19,11 +21,15 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val repository: AuthRepository,
-    private val googleSignInClient: GoogleSignInClient
+    private val googleSignInClient: GoogleSignInClient,
+    val facebookLoginManger: LoginManager
 ): ViewModel() {
 
     private val _googleState = MutableStateFlow<Resource<FirebaseUser>?> (null)
     val googleState: StateFlow<Resource<FirebaseUser>?> = _googleState
+
+    private val _facebookState = MutableStateFlow<Resource<FirebaseUser>?> (null)
+    val facebookState: StateFlow<Resource<FirebaseUser>?> = _facebookState
 
     private val _signInState = MutableStateFlow<Resource<FirebaseUser>?>(null)
     val signInState: StateFlow<Resource<FirebaseUser>?> = _signInState
@@ -59,6 +65,13 @@ class AuthViewModel @Inject constructor(
         _googleState.value = Resource.Loading()
         val result = repository.googleSignIn(credential)
         _googleState.value = result
+    }
+
+    fun facebookSignIn(credential: AuthCredential) = viewModelScope.launch {
+        _facebookState.value = Resource.Loading()
+        val result = repository.facebookSignIn(credential)
+        _facebookState.value = result
+
     }
 
     fun googleLaunch(

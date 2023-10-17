@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.noticeapp2.R
 import com.example.noticeapp2.data.repositories.auth.AuthRepository
 import com.example.noticeapp2.data.repositories.auth.AuthRepositoryImpl
+import com.facebook.login.LoginManager
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -25,8 +26,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesRepositoryImpl(firebaseAuth: FirebaseAuth, googleSignInClient: GoogleSignInClient): AuthRepository {
-        return AuthRepositoryImpl(firebaseAuth,googleSignInClient)
+    fun providesRepositoryImpl(firebaseAuth: FirebaseAuth, googleSignInClient: GoogleSignInClient, facebookLoginManager: LoginManager): AuthRepository {
+        return AuthRepositoryImpl(firebaseAuth,googleSignInClient, facebookLoginManager)
     }
 
     @Provides
@@ -39,4 +40,9 @@ object AppModule {
             .build()
         return GoogleSignIn.getClient(applicationContext, mGoogleSignInOptions)
     }
+
+    @Provides
+    @Singleton
+    fun provideLoginManager() = LoginManager.getInstance()
+
 }
