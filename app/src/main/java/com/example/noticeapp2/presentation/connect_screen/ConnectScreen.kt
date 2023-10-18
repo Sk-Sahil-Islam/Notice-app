@@ -79,6 +79,8 @@ fun ConnectScreen(
     navController: NavController,
     authViewModel: AuthViewModel = hiltViewModel()
 ) {
+    val facebookState = authViewModel.facebookState.collectAsState()
+
     val googleSignInState = authViewModel.googleState.collectAsState()
 
     val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {
@@ -221,6 +223,26 @@ fun ConnectScreen(
             }
         }
     }
+    facebookState.value?.let {
+        when (it) {
+            is Resource.Error -> {
+                LaunchedEffect(facebookState.value is Resource.Error) {
+                    Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            is Resource.Loading -> {}
+            is Resource.Success -> {
+                LaunchedEffect(Unit) {
+                    Toast.makeText(context, "Sign in successful", Toast.LENGTH_LONG)
+                        .show()
+                    navController.navigate(Screens.HomeScreen.route){
+                        popUpTo(0)
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -317,14 +339,10 @@ fun FacebookConnectOption(
     modifier: Modifier = Modifier,
     onAuthError: (Exception) -> Unit
 ) {
-    val facebookState = authViewModel.facebookState.collectAsState()
-    val context = LocalContext.current
+
     val scope = rememberCoroutineScope()
     val loginManager = authViewModel.facebookLoginManger
     val callbackManager = remember { CallbackManager.Factory.create() }
-
-
-
 
     val launcher = rememberLauncherForActivityResult(
         loginManager.createLogInActivityResultContract(callbackManager, null)
@@ -380,24 +398,5 @@ fun FacebookConnectOption(
             Text(text = "Facebook", fontFamily = Kanit, color = LocalContentColor.current.copy(0.75f))
         }
     }
-    facebookState.value?.let {
-        when (it) {
-            is Resource.Error -> {
-                LaunchedEffect(facebookState.value is Resource.Error) {
-                    Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
-                }
-            }
 
-            is Resource.Loading -> {}
-            is Resource.Success -> {
-                LaunchedEffect(Unit) {
-                    Toast.makeText(context, "Sign in successful", Toast.LENGTH_LONG)
-                        .show()
-                    navController.navigate(Screens.HomeScreen.route){
-                        popUpTo(0)
-                    }
-                }
-            }
-        }
-    }
 }

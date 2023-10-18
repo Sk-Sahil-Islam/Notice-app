@@ -25,7 +25,6 @@ class SignInViewModel @Inject constructor(): ViewModel() {
                 signInUiState.value = signInUiState.value.copy(
                     password = event.password
                 )
-                validatePassword()
             }
 
             is SignUpUiEvent.PasswordConfirmChange -> {}
@@ -41,18 +40,10 @@ class SignInViewModel @Inject constructor(): ViewModel() {
         )
     }
 
-    private fun validatePassword() {
-        val passwordResult = Validator.validatePassword(
-            password = signInUiState.value.password
-        )
-        signInUiState.value = signInUiState.value.copy(
-            passwordError = passwordResult.status
-        )
-    }
 
     fun validateAll(): Boolean {
         signInUiState.value.apply {
-            return passwordError && emailError
+            return emailError
         }
     }
 }

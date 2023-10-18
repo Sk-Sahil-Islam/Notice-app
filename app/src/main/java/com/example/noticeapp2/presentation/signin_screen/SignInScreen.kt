@@ -1,5 +1,6 @@
 package com.example.noticeapp2.presentation.signin_screen
 
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -29,6 +30,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -63,8 +65,13 @@ import com.example.noticeapp2.ui.theme.Kanit
 import com.example.noticeapp2.ui.theme.LinkColorDark
 import com.example.noticeapp2.ui.theme.LinkColorLight
 import com.example.noticeapp2.util.Resource
+import com.facebook.CallbackManager
+import com.facebook.FacebookCallback
+import com.facebook.FacebookException
+import com.facebook.login.LoginResult
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.launch
 
@@ -75,10 +82,17 @@ fun SignInScreen(
     signInViewModel: SignInViewModel = hiltViewModel(),
     navController: NavController
 ) {
+    val facebookState = authViewModel.facebookState.collectAsState()
+    val loginManager = authViewModel.facebookLoginManger
+    val callbackManager = remember { CallbackManager.Factory.create() }
+
+    val launcherFacebook = rememberLauncherForActivityResult(
+        loginManager.createLogInActivityResultContract(callbackManager, null)
+    ) {}
 
     val googleSignInState = authViewModel.googleState.collectAsState()
 
-    val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {
+    val launcherGoogle = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {
         val account = GoogleSignIn.getSignedInAccountFromIntent(it.data)
         try {
             val result = account.getResult(ApiException::class.java)
@@ -113,7 +127,6 @@ fun SignInScreen(
             modifier = Modifier.fillMaxWidth(),
             value = signInState.email,
             onValueChange = {
-                if (it.isEmpty()) isButtonEnabled.value = false
                 signInViewModel.onEvent(SignUpUiEvent.EmailChanged(it))
             },
             isError = !signInViewModel.signInUiState.value.emailError,
@@ -167,7 +180,7 @@ fun SignInScreen(
             enabled = isButtonEnabled.value && signInViewModel.validateAll() && signInState.password.isNotEmpty(),
             modifier = Modifier.width(200.dp)
         ) {
-            if (state.value is Resource.Loading || googleSignInState.value is Resource.Loading){
+            if (state.value is Resource.Loading || googleSignInState.value is Resource.Loading || facebookState.value is Resource.Loading){
                 CircularProgressIndicator(
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp)
@@ -218,10 +231,56 @@ fun SignInScreen(
 
         ConnectWith(
             onSignInWithGoogle = {
-                authViewModel.googleLaunch(launcher = launcher)
+                authViewModel.googleLaunch(launcher = launcherGoogle)
+            },
+            onSignInWithFacebook = {
+                launcherFacebook.launch(listOf("email", "public_profile"))
             }
         )
+        DisposableEffect(Unit) {
+            loginManager.registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
+                override fun onCancel() {}
 
+                override fun onError(error: FacebookException) {
+                    Log.e("Error in callback", "entered the onError function")
+                    Toast.makeText(context, error.message, Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onSuccess(result: LoginResult) {
+                    scope.launch {
+                        val token = result.accessToken.token
+                        val credential = FacebookAuthProvider.getCredential(token)
+                        authViewModel.facebookSignIn(credential)
+
+                    }
+                }
+            })
+
+            onDispose {
+                loginManager.unregisterCallback(callbackManager)
+            }
+        }
+
+        facebookState.value?.let {
+            when (it) {
+                is Resource.Error -> {
+                    LaunchedEffect(facebookState.value is Resource.Error) {
+                        Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                is Resource.Loading -> {}
+                is Resource.Success -> {
+                    LaunchedEffect(Unit) {
+                        Toast.makeText(context, "Sign in successful", Toast.LENGTH_LONG)
+                            .show()
+                        navController.navigate(Screens.HomeScreen.route){
+                            popUpTo(0)
+                        }
+                    }
+                }
+            }
+        }
 
         state.value?.let {
             when(it) {
@@ -272,7 +331,8 @@ fun SignInScreen(
 @Composable
 fun ConnectWith(
     modifier: Modifier = Modifier,
-    onSignInWithGoogle: () -> Unit
+    onSignInWithGoogle: () -> Unit,
+    onSignInWithFacebook: () -> Unit
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -292,7 +352,7 @@ fun ConnectWith(
 
         Spacer(modifier = Modifier.size(16.dp))
 
-        IconButton(onClick = { /*TODO*/ }) {
+        IconButton(onClick = { onSignInWithFacebook.invoke() }) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_facebook),
                 contentDescription = "facebook",
