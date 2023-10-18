@@ -89,12 +89,12 @@ fun SignInScreen(
         }
     }
 
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    val signInState by remember { signInViewModel.signInUiState }
+
     val scope = rememberCoroutineScope()
     val state = authViewModel.signInState.collectAsState()
     val context = LocalContext.current
-    val buttonEnabled = remember { mutableStateOf(true) }
+    val isButtonEnabled = remember { mutableStateOf(true) }
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
 
     Column(
@@ -111,9 +111,9 @@ fun SignInScreen(
         Spacer(modifier = Modifier.size(30.dp))
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
-            value = email,
+            value = signInState.email,
             onValueChange = {
-                email = it
+                if (it.isEmpty()) isButtonEnabled.value = false
                 signInViewModel.onEvent(SignUpUiEvent.EmailChanged(it))
             },
             isError = !signInViewModel.signInUiState.value.emailError,
@@ -133,20 +133,14 @@ fun SignInScreen(
 
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
-            value = password,
+            value = signInState.password,
             onValueChange = {
-                password = it
                 signInViewModel.onEvent(SignUpUiEvent.PasswordChange(it))
             },
-            isError = !signInViewModel.signInUiState.value.passwordError,
             label = { Text(text = "Password") },
             leadingIcon = { Icon(imageVector = Icons.Outlined.Lock, contentDescription = "password") },
             maxLines = 1,
             singleLine = true,
-            supportingText = {
-                if (!signInViewModel.signInUiState.value.passwordError)
-                    Text(text = "Minimum 6 characters.", color = MaterialTheme.colorScheme.error)
-            },
             trailingIcon = {
                 val image = if(passwordVisible) R.drawable.outline_visibility_24
                 else R.drawable.outline_visibility_off_24
@@ -167,10 +161,10 @@ fun SignInScreen(
         Button(
             onClick = {
                 scope.launch {
-                    authViewModel.loginUser(email, password)
+                    authViewModel.loginUser(signInState.email, signInState.password)
                 }
             },
-            enabled = buttonEnabled.value && signInViewModel.validateAll() && password.isNotEmpty(),
+            enabled = isButtonEnabled.value && signInViewModel.validateAll() && signInState.password.isNotEmpty(),
             modifier = Modifier.width(200.dp)
         ) {
             if (state.value is Resource.Loading || googleSignInState.value is Resource.Loading){
@@ -178,7 +172,7 @@ fun SignInScreen(
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp)
                 )
-                buttonEnabled.value = false
+                isButtonEnabled.value = false
             }
             else {
                 Text(text = "Sign In", fontSize = 15.sp)
@@ -234,14 +228,14 @@ fun SignInScreen(
                 is Resource.Error -> {
                     LaunchedEffect(state.value is Resource.Error) {
                         Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
-                        buttonEnabled.value = true
+                        isButtonEnabled.value = true
                     }
-                    buttonEnabled.value = true
+                    isButtonEnabled.value = true
                 }
                 is Resource.Loading -> {}
                 is Resource.Success -> {
                     LaunchedEffect(state.value is Resource.Success) {
-                        buttonEnabled.value = true
+                        isButtonEnabled.value = true
                         if (authViewModel.currentUser?.isEmailVerified == true){
                             Toast.makeText(context, "Sign in successful", Toast.LENGTH_LONG).show()
                             navController.navigate(Screens.HomeScreen.route){

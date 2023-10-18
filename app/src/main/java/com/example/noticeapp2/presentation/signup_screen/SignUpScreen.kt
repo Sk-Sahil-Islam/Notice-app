@@ -75,7 +75,7 @@ fun SignUpScreen(
     val scope = rememberCoroutineScope()
     val state = authViewModel.signUpState.collectAsState()
     val context = LocalContext.current
-    val buttonEnabled = remember { mutableStateOf(true) }
+    val isButtonEnabled = remember { mutableStateOf(true) }
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
 
     Column(
@@ -119,6 +119,7 @@ fun SignUpScreen(
             singleLine = true,
             onValueChange = {
                 email = it
+                if (it.isEmpty()) isButtonEnabled.value = false
                 signUpViewModel.onEvent(SignUpUiEvent.EmailChanged(it))
             },
             isError = !signUpViewModel.signUpUiState.value.emailError,
@@ -208,7 +209,7 @@ fun SignUpScreen(
                     authViewModel.registerUser(email, password)
                 }
             },
-            enabled = buttonEnabled.value && signUpViewModel.validateAll() && password.isNotEmpty(),
+            enabled = isButtonEnabled.value && signUpViewModel.validateAll() && password.isNotEmpty(),
             modifier = Modifier.width(200.dp)
         ) {
             if (state.value is Resource.Loading) {
@@ -216,7 +217,7 @@ fun SignUpScreen(
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp)
                 )
-                buttonEnabled.value = false
+                isButtonEnabled.value = false
             } else {
                 Text(text = "Sign Up", fontSize = 15.sp)
             }
@@ -265,7 +266,7 @@ fun SignUpScreen(
                 is Resource.Error -> {
                     LaunchedEffect(state.value is Resource.Error) {
                         Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
-                        buttonEnabled.value = true
+                        isButtonEnabled.value = true
                     }
                 }
 
