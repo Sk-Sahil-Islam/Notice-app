@@ -109,7 +109,7 @@ fun ConnectScreen(
 
         Spacer(modifier = Modifier.size(30.dp))
 
-        if (googleSignInState.value is Resource.Loading) {
+        if (googleSignInState.value is Resource.Loading || facebookState.value is Resource.Loading) {
             CircularProgressIndicator(modifier = Modifier.align(CenterHorizontally), color = MaterialTheme.colorScheme.primary)
             Spacer(modifier = Modifier.size(8.dp))
         }
