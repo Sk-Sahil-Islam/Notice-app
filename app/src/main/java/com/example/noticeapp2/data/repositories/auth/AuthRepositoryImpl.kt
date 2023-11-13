@@ -15,8 +15,7 @@ import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
-    private val googleSignInClient: GoogleSignInClient?,
-    private val facebookLoginManager: LoginManager?
+    private val googleSignInClient: GoogleSignInClient?
 ): AuthRepository {
     override val currentUser: FirebaseUser?
         get() = firebaseAuth.currentUser
