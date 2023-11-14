@@ -127,7 +127,7 @@ fun SignInScreen(
             modifier = Modifier.fillMaxWidth(),
             value = signInState.email,
             onValueChange = {
-                signInViewModel.onEvent(SignUpUiEvent.EmailChanged(it))
+                signInViewModel.onEvent(SignUpUiEvent.EmailChange(it))
             },
             isError = !signInViewModel.signInUiState.value.emailError,
             label = { Text(text = "Email") },

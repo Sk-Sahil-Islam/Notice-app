@@ -12,6 +12,7 @@ import com.example.noticeapp2.R
 val Kanit = FontFamily(
     Font(R.font.kanit_thin, FontWeight.Thin),
     Font(R.font.kanit_medium, FontWeight.Normal),
+    Font(R.font.kanit_light, FontWeight.Light),
     Font(R.font.kanit_extra_light, FontWeight.ExtraLight),
     Font(R.font.kanit_bold_italic, FontWeight.Bold, style = FontStyle.Italic),
     Font(R.font.kanit_light_italic, FontWeight.Light, style = FontStyle.Italic)

@@ -120,7 +120,7 @@ fun SignUpScreen(
             onValueChange = {
                 email = it
                 if (it.isEmpty()) isButtonEnabled.value = false
-                signUpViewModel.onEvent(SignUpUiEvent.EmailChanged(it))
+                signUpViewModel.onEvent(SignUpUiEvent.EmailChange(it))
             },
             isError = !signUpViewModel.signUpUiState.value.emailError,
             label = { Text(text = "Email") },

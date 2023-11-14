@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.noticeapp2.presentation.add_notice_screen.AddNoticeScreen
 import com.example.noticeapp2.presentation.connect_screen.ConnectScreen
 import com.example.noticeapp2.presentation.home_screen.HomeScreen
 import com.example.noticeapp2.presentation.signin_screen.SignInScreen
@@ -131,6 +132,37 @@ fun NavigationGraph(
             }
         ) {
             ConnectScreen(navController = navController)
+        }
+
+
+        composable(
+            route = Screens.NoticeScreen.route,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(700)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(700)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                    animationSpec = tween(700)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                    animationSpec = tween(700)
+                )
+            }
+        ) {
+            AddNoticeScreen(navController = navController)
         }
     }
 }

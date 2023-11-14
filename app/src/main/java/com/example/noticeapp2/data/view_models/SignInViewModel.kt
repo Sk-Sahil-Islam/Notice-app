@@ -14,7 +14,7 @@ class SignInViewModel @Inject constructor(): ViewModel() {
 
     fun onEvent(event: SignUpUiEvent){
         when(event) {
-            is SignUpUiEvent.EmailChanged -> {
+            is SignUpUiEvent.EmailChange -> {
                 signInUiState.value = signInUiState.value.copy(
                     email = event.email
                 )
