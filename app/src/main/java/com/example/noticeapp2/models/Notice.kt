@@ -1,4 +1,4 @@
-package com.example.noticeapp2.data.repositories.notices
+package com.example.noticeapp2.models
 
 data class Notice(
     val heading: String = "",

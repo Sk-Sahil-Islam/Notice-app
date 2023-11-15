@@ -1,12 +1,8 @@
 package com.example.noticeapp2.presentation.add_notice_screen
 
-import android.widget.Space
 import android.widget.Toast
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,10 +21,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TextFieldDefaults.indicatorLine
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -44,16 +38,13 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.noticeapp2.data.repositories.notices.Notice
+import com.example.noticeapp2.models.Notice
 import com.example.noticeapp2.data.view_models.NoticeViewModel
 import com.example.noticeapp2.navigation.Screens
 import com.example.noticeapp2.ui.theme.Kanit
@@ -68,12 +59,12 @@ fun AddNoticeScreen(
     var heading by remember { noticeViewModel.heading }
     var body by remember { noticeViewModel.body }
 
-    val state = noticeViewModel.state.collectAsState()
+    val state = noticeViewModel.insertState.collectAsState()
 
     Scaffold(topBar = {
         TopAppBar(title = {
             Text(
-                text = "ADD NOTICE", fontFamily = Kanit, fontWeight = FontWeight.ExtraLight
+                text = "ADD NOTICE", fontFamily = Kanit, fontWeight = FontWeight.ExtraLight, fontSize = 14.sp
             )
         }, navigationIcon = {
             IconButton(onClick = {
@@ -119,9 +110,9 @@ fun AddNoticeScreen(
                     },
                     colors = TextFieldDefaults.textFieldColors(
                         containerColor = Color.Transparent,
-                        focusedIndicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                        disabledIndicatorColor = LocalContentColor.current.copy(alpha = 0.3f),
-                        unfocusedIndicatorColor = LocalContentColor.current.copy(alpha = 0.3f)
+                        focusedIndicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+                        disabledIndicatorColor = LocalContentColor.current.copy(alpha = 0.2f),
+                        unfocusedIndicatorColor = LocalContentColor.current.copy(alpha = 0.2f)
                     ),
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Next
