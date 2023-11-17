@@ -38,8 +38,6 @@ fun HomeScreen(
     navController: NavController
 ) {
 
-    val res by noticeViewModel.res.collectAsState()
-
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = {
@@ -67,24 +65,10 @@ fun HomeScreen(
             }) {
                 Text(text = "Logout")
             }
+
+
+            NoticeBoard()
         }
-        when(res) {
-            is Resource.Error -> {
-                Text(text = "There was an error")
-            }
-            is Resource.Loading -> {
-                CircularProgressIndicator()
-            }
-            is Resource.Success -> {
-                LazyColumn{
-                    items(res.data!!) { item ->  
-                        Column(modifier = Modifier.fillMaxWidth()) {
-                            Text(text = item.heading)
-                            Text(text = item.body)
-                        }
-                    }
-                }
-            }
-        }
+
     }
 }

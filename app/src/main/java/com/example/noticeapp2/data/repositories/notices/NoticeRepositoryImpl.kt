@@ -3,6 +3,8 @@ package com.example.noticeapp2.data.repositories.notices
 import com.example.noticeapp2.models.Notice
 import com.example.noticeapp2.util.Resource
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -14,6 +16,7 @@ class NoticeRepositoryImpl @Inject constructor(
     private val noticeCollectionRef: CollectionReference
 ) : NoticeRepository {
     override suspend fun insert(notice: Notice): Resource<String> {
+        notice.timestamp = FieldValue.serverTimestamp()
         return try {
             noticeCollectionRef.add(notice).await()
             Resource.Success("Insert successful")
@@ -24,25 +27,9 @@ class NoticeRepositoryImpl @Inject constructor(
     }
 
     override fun getItems(): Flow<Resource<List<Notice>>> = callbackFlow{
-//        trySend(Resource.Loading())
-//
-//        val subscription = noticeCollectionRef
-//            .get()
-//            .addOnCompleteListener { task->
-//                if(task.isSuccessful) {
-//                    val data = task.result?.documents?.mapNotNull { documentSnapshot ->
-//                        documentSnapshot.toObject<Notice>()
-//                    } ?: emptyList()
-//                    trySend(Resource.Success(data))
-//                } else {
-//                    trySend(Resource.Error(task.exception?.message!!))
-//                }
-//            }
-//        awaitClose {
-//            close()
-//        }
 
         val snapShotListener = noticeCollectionRef
+            .orderBy("timestamp", Query.Direction.DESCENDING)
             .addSnapshotListener { querySnapShot, error ->
                 if(error != null) {
                     trySend(Resource.Error(error.message.toString()))

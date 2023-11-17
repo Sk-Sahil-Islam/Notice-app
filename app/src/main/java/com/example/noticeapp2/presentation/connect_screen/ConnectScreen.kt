@@ -21,6 +21,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -133,7 +134,7 @@ fun ConnectScreen(
         Text(
             text = "An app for managing notifications tailored to a user-friendly experience.",
             fontFamily = Kanit,
-            fontWeight = FontWeight.ExtraLight,
+            fontWeight = FontWeight.Light,
             fontSize = 18.sp
         )
         Spacer(modifier = Modifier.size(38.dp))
@@ -147,7 +148,8 @@ fun ConnectScreen(
                         }
                     }
                 },
-                modifier = Modifier.width(125.dp)
+                modifier = Modifier.width(125.dp),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
             ) {
                 Text(text = "Sign In",  fontSize = 15.sp)
             }
@@ -193,7 +195,6 @@ fun ConnectScreen(
 
             FacebookConnectOption(
                 authViewModel = authViewModel,
-                navController,
                 modifier = Modifier.weight(1f),
                 onAuthError = {
                     Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
@@ -307,7 +308,7 @@ fun GoogleConnectOption(
             onSignInByGoogleClick.invoke()
         },
         modifier = modifier,
-        border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary.copy(alpha = 0.65f)),
+        border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary.copy(alpha = 0.85f)),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(Color.Transparent)
     ) {
@@ -315,6 +316,7 @@ fun GoogleConnectOption(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier
+                .fillMaxWidth()
                 .padding(10.dp)
         ) {
             Icon(
@@ -325,7 +327,7 @@ fun GoogleConnectOption(
                     .size(20.dp)
             )
             Spacer(modifier = Modifier.size(8.dp))
-            Text(text = "Google", fontFamily = Kanit, color = LocalContentColor.current.copy(0.75f))
+            Text(text = "Google", fontFamily = Kanit, color = LocalContentColor.current)
         }
 
     }
@@ -335,7 +337,6 @@ fun GoogleConnectOption(
 @Composable
 fun FacebookConnectOption(
     authViewModel: AuthViewModel,
-    navController: NavController,
     modifier: Modifier = Modifier,
     onAuthError: (Exception) -> Unit
 ) {
@@ -377,7 +378,7 @@ fun FacebookConnectOption(
             launcher.launch(listOf("email", "public_profile"))
         },
         modifier = modifier,
-        border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary.copy(alpha = 0.65f)),
+        border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary.copy(alpha = 0.85f)),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(Color.Transparent),
     ) {
@@ -385,6 +386,7 @@ fun FacebookConnectOption(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier
+                .fillMaxWidth()
                 .padding(10.dp)
         ) {
             Icon(
@@ -395,7 +397,7 @@ fun FacebookConnectOption(
                     .size(20.dp)
             )
             Spacer(modifier = Modifier.size(8.dp))
-            Text(text = "Facebook", fontFamily = Kanit, color = LocalContentColor.current.copy(0.75f))
+            Text(text = "Facebook", fontFamily = Kanit, color = LocalContentColor.current)
         }
     }
 

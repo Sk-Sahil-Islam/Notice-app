@@ -64,7 +64,7 @@ fun AddNoticeScreen(
     Scaffold(topBar = {
         TopAppBar(title = {
             Text(
-                text = "ADD NOTICE", fontFamily = Kanit, fontWeight = FontWeight.ExtraLight, fontSize = 14.sp
+                text = "ADD NOTICE", fontFamily = Kanit, fontWeight = FontWeight.ExtraLight, fontSize = 18.sp
             )
         }, navigationIcon = {
             IconButton(onClick = {
@@ -78,7 +78,12 @@ fun AddNoticeScreen(
             IconButton(onClick = {
                 noticeViewModel.insertNotice(Notice(heading = heading, body = body))
             }) {
-                Icon(imageVector = Icons.Default.Check, contentDescription = "Insert", modifier = Modifier.size(30.dp))
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Insert",
+                    modifier = Modifier.size(30.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
             }
         }, colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color.Transparent)
         )
