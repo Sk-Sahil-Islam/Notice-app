@@ -1,4 +1,4 @@
-package com.example.noticeapp2.presentation.add_notice_screen
+package com.example.noticeapp2.presentation.notice_screen
 
 import android.widget.Toast
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -58,6 +59,7 @@ fun AddNoticeScreen(
     val context = LocalContext.current
     var heading by remember { noticeViewModel.heading }
     var body by remember { noticeViewModel.body }
+    var isButtonEnabled by remember { mutableStateOf(true) }
 
     val state = noticeViewModel.insertState.collectAsState()
 
@@ -77,7 +79,10 @@ fun AddNoticeScreen(
         }, actions = {
             IconButton(onClick = {
                 noticeViewModel.insertNotice(Notice(heading = heading, body = body))
-            }) {
+                isButtonEnabled = false
+            },
+                enabled = isButtonEnabled
+                ) {
                 Icon(
                     imageVector = Icons.Default.Check,
                     contentDescription = "Insert",
@@ -103,13 +108,13 @@ fun AddNoticeScreen(
                     modifier = Modifier.fillMaxWidth(),
                     value = heading,
                     onValueChange = { heading = it },
-                    fontSize = 27.sp,
+                    fontSize = 25.sp,
                     fontWeight = FontWeight.Light,
                     placeholder = {
                         Text(
                             text = "Heading",
                             fontFamily = Kanit,
-                            fontSize = 27.sp,
+                            fontSize = 25.sp,
                             fontWeight = FontWeight.Light
                         )
                     },
@@ -127,12 +132,13 @@ fun AddNoticeScreen(
                 CustomTextField(
                     modifier = Modifier.fillMaxSize(),
                     value = body,
+                    fontSize = 17.sp,
                     onValueChange = { body = it },
                     placeholder = {
                         Text(
                             text = "Body",
                             fontFamily = Kanit,
-                            fontSize = 18.sp,
+                            fontSize = 17.sp,
                             fontWeight = FontWeight.W300
                         )
                     },
@@ -155,7 +161,9 @@ fun AddNoticeScreen(
                     is Resource.Error -> {
                         LaunchedEffect(state.value is Resource.Error) {
                             Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+                            isButtonEnabled = true
                         }
+                        isButtonEnabled = true
                     }
 
                     is Resource.Loading -> {}
@@ -165,6 +173,7 @@ fun AddNoticeScreen(
                             navController.navigate(Screens.HomeScreen.route) {
                                 popUpTo(0)
                             }
+                            isButtonEnabled = false
                         }
                     }
                 }

@@ -1,11 +1,9 @@
 package com.example.noticeapp2.data.view_models
 
-import android.content.ClipData.Item
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.noticeapp2.data.NoticeUiEvent
 import com.example.noticeapp2.models.Notice
 import com.example.noticeapp2.data.repositories.notices.NoticeRepository
 import com.example.noticeapp2.util.Resource
@@ -19,6 +17,10 @@ import javax.inject.Inject
 class NoticeViewModel @Inject constructor(
     private val repository: NoticeRepository
 ) : ViewModel() {
+
+    var noticeState = mutableStateOf(Notice())
+    val isEditingStartedHead = mutableStateOf(false)
+    val isEditingStartedBody = mutableStateOf(false)
 
     val heading = mutableStateOf("")
     val body = mutableStateOf("")
@@ -42,6 +44,21 @@ class NoticeViewModel @Inject constructor(
     fun getNotice() = viewModelScope.launch {
         repository.getItems().collect {
             _res.value = it
+        }
+    }
+
+    fun onEvent(event: NoticeUiEvent) {
+        when(event) {
+            is NoticeUiEvent.BodyChange -> {
+                noticeState.value = noticeState.value.copy(
+                    body = event.body
+                )
+            }
+            is NoticeUiEvent.HeadingChange -> {
+                noticeState.value = noticeState.value.copy(
+                    heading = event.heading
+                )
+            }
         }
     }
 

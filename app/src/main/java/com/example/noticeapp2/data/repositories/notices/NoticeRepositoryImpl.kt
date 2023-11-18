@@ -16,13 +16,23 @@ class NoticeRepositoryImpl @Inject constructor(
     private val noticeCollectionRef: CollectionReference
 ) : NoticeRepository {
     override suspend fun insert(notice: Notice): Resource<String> {
+
+        val document = if(notice.noticeId.isEmpty()) {
+            noticeCollectionRef.document()
+        } else {
+            notice.isEdited = true
+            noticeCollectionRef.document(notice.noticeId)
+        }
+        notice.noticeId = document.id
         notice.timestamp = FieldValue.serverTimestamp()
+
         return try {
-            noticeCollectionRef.add(notice).await()
+            document.set(notice).await()
             Resource.Success("Insert successful")
         } catch (e: Exception){
             e.printStackTrace()
-            Resource.Error(e.message.toString())
+            notice.isEdited = false
+            Resource.Error(e.message ?: "Error while inserting")
         }
     }
 
