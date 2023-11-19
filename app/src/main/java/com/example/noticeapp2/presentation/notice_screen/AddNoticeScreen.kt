@@ -61,7 +61,7 @@ fun AddNoticeScreen(
     var body by remember { noticeViewModel.body }
     var isButtonEnabled by remember { mutableStateOf(true) }
 
-    val state = noticeViewModel.insertState.collectAsState()
+    val state = noticeViewModel.state.collectAsState()
 
     Scaffold(topBar = {
         TopAppBar(title = {

@@ -25,8 +25,8 @@ class NoticeViewModel @Inject constructor(
     val heading = mutableStateOf("")
     val body = mutableStateOf("")
 
-    private val _insertState = MutableStateFlow<Resource<String>?>(null)
-    val insertState: StateFlow<Resource<String>?> = _insertState
+    private val _state = MutableStateFlow<Resource<String>?>(null)
+    val state: StateFlow<Resource<String>?> = _state
 
     private val _res =  MutableStateFlow<Resource<List<Notice>>>(Resource.Loading())
     val res: StateFlow<Resource<List<Notice>>> = _res
@@ -36,9 +36,15 @@ class NoticeViewModel @Inject constructor(
     }
 
     fun insertNotice(notice: Notice) = viewModelScope.launch {
-        _insertState.value = Resource.Loading()
+        _state.value = Resource.Loading()
         val result = repository.insert(notice)
-        _insertState.value = result
+        _state.value = result
+    }
+
+    fun deleteNotice(noticeId: String) = viewModelScope.launch {
+        _state.value = Resource.Loading()
+        val result = repository.delete(noticeId)
+        _state.value = result
     }
 
     fun getNotice() = viewModelScope.launch {

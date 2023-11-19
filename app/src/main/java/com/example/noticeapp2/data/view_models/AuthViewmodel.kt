@@ -3,6 +3,7 @@ package com.example.noticeapp2.data.view_models
 import android.content.Intent
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.result.ActivityResult
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.noticeapp2.data.repositories.auth.AuthRepository
@@ -40,11 +41,18 @@ class AuthViewModel @Inject constructor(
     val currentUser
         get() = repository.currentUser
 
-//    init {
-//        if(repository.currentUser != null) {
-//            _signInState.value = Resource.Success(repository.currentUser!!)
-//        }
-//    }
+
+    val isUserLoggedIn: MutableLiveData<Boolean> = MutableLiveData(false)
+
+    fun checkForActiveSession(){
+        if(repository.currentUser != null) {
+            isUserLoggedIn.value = true
+        } else {
+            isUserLoggedIn.value = false
+        }
+    }
+
+
 
     fun loginUser(email: String, password: String) = viewModelScope.launch {
         _signInState.value = Resource.Loading()

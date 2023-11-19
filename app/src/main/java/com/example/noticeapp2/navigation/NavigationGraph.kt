@@ -3,11 +3,13 @@ package com.example.noticeapp2.navigation
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.noticeapp2.data.view_models.AuthViewModel
 import com.example.noticeapp2.presentation.notice_screen.AddNoticeScreen
 import com.example.noticeapp2.presentation.connect_screen.ConnectScreen
 import com.example.noticeapp2.presentation.home_screen.HomeScreen
@@ -18,9 +20,12 @@ import java.util.Base64
 
 @Composable
 fun NavigationGraph(
-    navController: NavHostController
+    navController: NavHostController,
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
-    NavHost(navController = navController, startDestination = Screens.ConnectScreen.route) {
+    authViewModel.checkForActiveSession()
+    val isUserLoggedIn = authViewModel.isUserLoggedIn.value
+    NavHost(navController = navController, startDestination = if(isUserLoggedIn == true) Screens.HomeScreen.route else Screens.ConnectScreen.route) {
         composable(
             route = Screens.SignUpScreen.route,
             enterTransition = {

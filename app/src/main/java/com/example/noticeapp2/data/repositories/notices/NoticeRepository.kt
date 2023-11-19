@@ -7,6 +7,5 @@ import kotlinx.coroutines.flow.Flow
 interface NoticeRepository {
     suspend fun insert(notice: Notice): Resource<String>
     fun getItems(): Flow<Resource<List<Notice>>>
-    suspend fun delete(notice: Notice): Resource<String>
-    suspend fun update(notice: Notice): Resource<String>
+    suspend fun delete(noticeId: String): Resource<String>
 }

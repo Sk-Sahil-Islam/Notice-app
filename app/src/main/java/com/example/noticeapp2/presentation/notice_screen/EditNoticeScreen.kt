@@ -1,6 +1,5 @@
 package com.example.noticeapp2.presentation.notice_screen
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -74,7 +73,7 @@ fun EditNoticeScreen(
         )
     }
 
-    val state = noticeViewModel.insertState.collectAsState()
+    val state = noticeViewModel.state.collectAsState()
 
     Scaffold(topBar = {
         TopAppBar(title = {

@@ -4,6 +4,7 @@ import com.example.noticeapp2.models.Notice
 import com.example.noticeapp2.util.Resource
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.channels.awaitClose
@@ -28,8 +29,8 @@ class NoticeRepositoryImpl @Inject constructor(
 
         return try {
             document.set(notice).await()
-            Resource.Success("Insert successful")
-        } catch (e: Exception){
+            Resource.Success(if(!notice.isEdited) "Insert successful" else "Edit successful")
+        } catch (e: FirebaseFirestoreException){
             e.printStackTrace()
             notice.isEdited = false
             Resource.Error(e.message ?: "Error while inserting")
@@ -42,7 +43,7 @@ class NoticeRepositoryImpl @Inject constructor(
             .orderBy("timestamp", Query.Direction.DESCENDING)
             .addSnapshotListener { querySnapShot, error ->
                 if(error != null) {
-                    trySend(Resource.Error(error.message.toString()))
+                    trySend(Resource.Error(message = error.message.toString()))
                     close(error)
                     return@addSnapshotListener
                 }
@@ -58,11 +59,15 @@ class NoticeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun delete(notice: Notice): Resource<String> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun delete(noticeId: String): Resource<String> {
+        val document = noticeCollectionRef.document(noticeId)
 
-    override suspend fun update(notice: Notice): Resource<String> {
-        TODO("Not yet implemented")
+        return try {
+            document.delete().await()
+            Resource.Success("Notice deleted successfully")
+        } catch (e: FirebaseFirestoreException) {
+            e.printStackTrace()
+            Resource.Error(e.message ?: "Error while deleting")
+        }
     }
 }
